@@ -13,7 +13,7 @@ Texture     TexCloudB   images/mario/cloudbig.png
 Texture     TexCloudS   images/mario/cloudsmall.png
 Texture     TexBush     images/mario/bush.png
 Texture     TexBushBig   images/mario/bushbig.png
-Texture     TexGround   images/mario/ground.png
+Texture     TexGround   images/worldassets/ground.png
 Texture     TexBlock    images/mario/block.png
 Texture     TexPole     images/mario/flagpole.png
 Texture     TexPoleTop  images/mario/flagtop.png

@@ -27,7 +27,10 @@ void Scene_Play::init(const std::string& path)
 	registerAction(sf::Keyboard::A, "LEFT");
 	registerAction(sf::Keyboard::W, "UP");
 	registerAction(sf::Keyboard::S, "DOWN");
+	registerAction(sf::Keyboard::Space, "SHOOT");
 
+
+    // auto sound.setBuffer(m_soundMap.at(soundName)); // Use the buffer from the map
 
 	// sf::SoundBuffer buffer;
     // if (!buffer.loadFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav")){
@@ -37,17 +40,28 @@ void Scene_Play::init(const std::string& path)
 	// sf::Sound sound;
 	// sound.setBuffer(buffer);
 	// sound.play();
-	sf::Music music;
-	// if (!music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav")){
-	// 		std::cout << "BAD SOUND";
-	// }
+	// sf::Music music;
+	// // if (!music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav")){
+	// // 		std::cout << "BAD SOUND";
+	// // }
+	// 	// sf::SoundBuffer buffer;
+	// 	// // load something into the sound buffer...
+	// 	// buffer.loadFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav");
+    
 
-    if (music.getStatus() == sf::Music::Status::Stopped) {
-   		music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav");
-   		music.play();
-	}
-	
+	// 	// sf::Sound sound;
+	// 	// sound.setBuffer(buffer);
+	// 	// sound.play();
+
+    // if (music.getStatus() == sf::Music::Status::Stopped) {
+   	// 	music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav");
+   	// 	music.play();
+	// }
+    // auto sound.setBuffer(m_soundMap.at(soundName)); // Use the buffer from the map
         
+	// auto sound = m_game->soundmanager().getSound("scream");
+	// m_game->soundmanager().playSound("scream"); // Play sound
+
 
 	m_gridText.setCharacterSize(12);
 	m_gridText.setFont(m_game->assets().getFont("Arial"));
@@ -97,6 +111,8 @@ void Scene_Play::spawnPlayer()
 	m_player->addComponent<CTransform>(Vec2(224, 352));
 	m_player->addComponent<CBoundingBox>(Vec2(48, 58));
 	m_player->addComponent<CGravity>(1);
+
+	PlayerConfig().WEAPON = "buster";
 
 	// TODO: be sure to add the remaining componnets to the player
 	//load player config aswell
@@ -198,6 +214,20 @@ void Scene_Play::loadlevel(const std::string& filename)
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
 {
 	//TODO: this should spwan a bullet at the given entity, going in the direction the entity is facing
+	//this is not where input should be handled
+	auto bullet = m_entityManager.addEntity("bullet");
+	bullet->addComponent<CAnimation>(m_game->assets().getAnimation("Buster"),false);
+	bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>().pos.x,entity->getComponent<CTransform>().pos.y));
+	if(entity->getComponent<CTransform>().scale.x > 0){
+		bullet->getComponent<CTransform>().velocity.x = 10;
+	}
+	else{
+		bullet->getComponent<CTransform>().velocity.x = -10;
+	}
+	bullet->addComponent<CBoundingBox>(Vec2(24,18));
+
+	// m_player->getComponent<CInput>().canShoot = true;
+
 }
 
 void Scene_Play::update()
@@ -206,7 +236,7 @@ void Scene_Play::update()
 
 	//TODO: implement pause functionality
 	sMovement();
-	// sLifeSpan();
+	sLifeSpan();
 	sCollision();
 	sAnimation();
 	sRender();
@@ -283,19 +313,32 @@ void Scene_Play::sMovement()
 	}
 	// std::cout << m_player->getComponent<CTransform>().velocity.y <<std::endl;
 
+	//ADDING SHOOT BUTTON PRESS
+	if(m_player->getComponent<CInput>().canShoot == true && m_player->getComponent<CInput>().shoot == true){
+		spawnBullet(m_player);
+		m_player->getComponent<CInput>().canShoot = false;
+	}
+	if(m_player->getComponent<CInput>().canShoot == false && m_player->getComponent<CInput>().shoot == false){
+		// spawnBullet(m_player);
+		m_player->getComponent<CInput>().canShoot = true;
+	}
+
 	
 	m_player->getComponent<CTransform>().velocity = playerVelocity;
+
+
 	// TODO: Implement gravity's effect on the player
 	// TODO: Implement the maximum player speed in bothg X and Y directions
 	// NOTE: Setting an entity's scale.x to -1/1 will make it face to the left/right
 
+	//MOVEMENT LOOP
 	for(auto e: m_entityManager.getEntities()){
 		//if entity has gravity and has a y velocity less that 10 add gravity to it
 		if(e->hasComponent<CGravity>() && e->getComponent<CTransform>().velocity.y < 15){
 			e->getComponent<CTransform>().velocity.y += e->getComponent<CGravity>().gravity;
 			// e->getComponent<CTransform>().pos.y += e->getComponent<CTransform>().velocity.y; 
 		}
-		if(e->getComponent<CTransform>().velocity.y == 15 && m_player->getComponent<CInput>().canJump){ //removed ground Cstate
+		if(e->getComponent<CTransform>().velocity.y == 15 && m_player->getComponent<CInput>().canJump && e->hasComponent<CBoundingBox>()){ //removed ground Cstate
 			e->getComponent<CTransform>().velocity.y = 0;
 		}
 		//this gets previous position
@@ -306,19 +349,24 @@ void Scene_Play::sMovement()
 		//falling and jumping
 		e->getComponent<CTransform>().pos.y += e->getComponent<CTransform>().velocity.y; 
 
-
 	}
 
-	//gravity
-	// auto& pPos = m_player->getComponent<CTransform>().pos; 
-	// std::cout << pPos.x <<std::endl;
-	// pPos.y = pPos.y + 2;
 
 }
 
 void Scene_Play::sLifeSpan()
 {
 	//TODO: Check lifespan of entities that have them, and destroy them if they go over
+	for(auto b: m_entityManager.getEntities()){
+            // std::cout << b->cLifespan->total << "this is total";
+            if(b->hasComponent<CLifespan>()){
+				// std::cout << "m_currentFrame: " << m_currentFrame << std::endl;
+
+				if(b->getComponent<CLifespan>().total <= m_currentFrame){
+                	b->destroy();
+				}
+            }
+        }
 }
 
 void Scene_Play::sCollision()
@@ -332,13 +380,73 @@ void Scene_Play::sCollision()
 	//TODO: Implement Physics::GetOverlap() function, use it inside this function
 	Physics apple;
 	// Vec2 overlap = apple.GetOverlap(m_player, m_player);
+	for(auto b:m_entityManager.getEntities("bullet")){
+		for(auto e:m_entityManager.getEntities()){
+			if(e->hasComponent<CBoundingBox>() && e->tag() != "player" && e->tag() != "bullet"){
+				Vec2 bulletoverlap = apple.GetOverlap(b, e);
+
+				if(bulletoverlap.x > 0 && bulletoverlap.y > 0){
+					// std::cout << "bullet collided" <<std::endl;
+					b->destroy();
+					if(e->tag() == "Brick"){
+						// std::cout << "hit da brick" <<std::endl;
+						e->addComponent<CAnimation>(m_game->assets().getAnimation("Brick2"),false);
+								e->addComponent<CLifespan>(m_currentFrame + .5);
+								m_game->soundmanager().playSound("burp"); // Play sound
+
+								// e->destroy();
+								auto piece = m_entityManager.addEntity("piece");
+								piece->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece->addComponent<CGravity>(.5);
+								piece->getComponent<CTransform>().velocity = Vec2(-3,-15);
+								piece->getComponent<CTransform>().scale.x = .7; 
+								piece->getComponent<CTransform>().scale.y = .7; 
+
+
+
+								auto piece1 = m_entityManager.addEntity("piece");
+								piece1->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece1->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece1->addComponent<CGravity>(.5);
+								piece1->getComponent<CTransform>().velocity = Vec2(3,-15);
+								piece1->getComponent<CTransform>().scale.x = -.7; 
+								piece1->getComponent<CTransform>().scale.y = .7; 
+
+
+
+								auto piece2 = m_entityManager.addEntity("piece");
+								piece2->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece2->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece2->addComponent<CGravity>(.5);
+								piece2->getComponent<CTransform>().velocity = Vec2(-3,-10);
+								piece2->getComponent<CTransform>().scale.x = .7; 
+								piece2->getComponent<CTransform>().scale.y = -.7; 
+
+
+
+								auto piece3 = m_entityManager.addEntity("piece");
+								piece3->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece3->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece3->addComponent<CGravity>(.5);
+								piece3->getComponent<CTransform>().velocity = Vec2(3,-10);
+								piece3->getComponent<CTransform>().scale.x = -.7; 
+								piece3->getComponent<CTransform>().scale.y = -.7; 
+
+					}
+				}
+
+
+
+			}
+		}
+	}
 	for(auto e:m_entityManager.getEntities()){
 		//player/tile collision
 		//i think overlap is not getting proper overlap based on midpoint
-		if(e->hasComponent<CBoundingBox>() && e->tag() != "player"){
+		if(e->hasComponent<CBoundingBox>() && e->tag() != "player" && e->tag() != "bullet"){
 			Vec2 overlap = apple.GetOverlap(m_player, e);
-
-			//there is collision
+			//there is collision with player
 			if(overlap.x > 0 && overlap.y > 0){      	
 				Vec2 prevOverlap = apple.GetPreviousOverlap(m_player,e);
 				//verticle 
@@ -369,8 +477,60 @@ void Scene_Play::sCollision()
 								e->addComponent<CAnimation>(m_game->assets().getAnimation("Question2"),true);
 
 							}
+							//if player hits a brick block from under
 							if(e->getComponent<CAnimation>().animation.getName() == "Brick"){
-								std::cout <<"hit the brick" <<std::endl;
+								// std::cout <<"hit the brick" <<std::endl;
+
+								//change brick animation
+								e->addComponent<CAnimation>(m_game->assets().getAnimation("Brick2"),false);
+								e->addComponent<CLifespan>(m_currentFrame + .5);
+								m_game->soundmanager().playSound("burp"); // Play sound
+
+								// e->destroy();
+								auto piece = m_entityManager.addEntity("piece");
+								piece->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece->addComponent<CGravity>(.5);
+								piece->getComponent<CTransform>().velocity = Vec2(-3,-15);
+								piece->getComponent<CTransform>().scale.x = .7; 
+								piece->getComponent<CTransform>().scale.y = .7; 
+
+
+
+								auto piece1 = m_entityManager.addEntity("piece");
+								piece1->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece1->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece1->addComponent<CGravity>(.5);
+								piece1->getComponent<CTransform>().velocity = Vec2(3,-15);
+								piece1->getComponent<CTransform>().scale.x = -.7; 
+								piece1->getComponent<CTransform>().scale.y = .7; 
+
+
+
+								auto piece2 = m_entityManager.addEntity("piece");
+								piece2->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece2->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece2->addComponent<CGravity>(.5);
+								piece2->getComponent<CTransform>().velocity = Vec2(-3,-10);
+								piece2->getComponent<CTransform>().scale.x = .7; 
+								piece2->getComponent<CTransform>().scale.y = -.7; 
+
+
+
+								auto piece3 = m_entityManager.addEntity("piece");
+								piece3->addComponent<CAnimation>(m_game->assets().getAnimation("Piece"),true);
+								piece3->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x,e->getComponent<CTransform>().pos.y));
+								piece3->addComponent<CGravity>(.5);
+								piece3->getComponent<CTransform>().velocity = Vec2(3,-10);
+								piece3->getComponent<CTransform>().scale.x = -.7; 
+								piece3->getComponent<CTransform>().scale.y = -.7; 
+
+
+
+
+
+
+								//spawn in small pieces and give them gravity 
 							}
 
 						}
@@ -390,17 +550,30 @@ void Scene_Play::sCollision()
 				}
 
 				if(e->getComponent<CAnimation>().animation.getName() == "Coin"){
-					std::cout <<"Deystroy this cig" <<std::endl;
+					// std::cout <<"Deystroy this cig" <<std::endl;
 					e->destroy();
 				}
     		}
+
+			
 			
 			//player /left world colision
 			if(m_player->getComponent<CTransform>().pos.x < 0){
+				// m_game->soundmanager().playSound("scream"); // Play sound
 				m_player->getComponent<CTransform>().pos.x += 1;
 			}
 			//player/falling into pit collision
 			if(m_player->getComponent<CTransform>().pos.y > height()+32){
+				// SoundManager soundManager;
+				// if (!m_game->soundmanager().addSound("scream", "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav")) {
+				// 	std::cout << "BAD APPLE "; // Handle error if sound fails to load
+				// }
+				// auto sound = m_game->soundmanager().getSound("scream");
+				// auto sound = m_game->getSound("scream");
+				// sound->play();
+				m_game->soundmanager().playSound("scream"); // Play sound
+				// m_game->assets().playSound("scream");
+				
 				m_player->getComponent<CTransform>().pos.x =224;
 				m_player->getComponent<CTransform>().pos.y =352;
 			}
@@ -434,9 +607,7 @@ void Scene_Play::sDoAction(const Action& action)
 		else if (action.name() == "LEFT") {m_player->getComponent<CInput>().left = true;}
 		else if (action.name() == "UP") {m_player->getComponent<CInput>().up = true;}
 		else if (action.name() == "DOWN") {m_player->getComponent<CInput>().down = true;}
-
-
-
+		else if (action.name() == "SHOOT") {m_player->getComponent<CInput>().shoot = true;}
 
 	}
 	else if (action.type() == "END")
@@ -445,8 +616,7 @@ void Scene_Play::sDoAction(const Action& action)
 		if(action.name() == "LEFT") {m_player->getComponent<CInput>().left = false;}
 		if(action.name() == "UP") {m_player->getComponent<CInput>().up = false;}
 		if(action.name() == "DOWN") {m_player->getComponent<CInput>().down = false;}
-
-
+		if(action.name() == "SHOOT") {m_player->getComponent<CInput>().shoot = false;}
 
 	}
 }
@@ -504,8 +674,10 @@ void Scene_Play::drawLine(const Vec2& p1, const Vec2& p2)
 void Scene_Play::sRender()
 {
 	// // color the background darker so you know that the game is paused
-	if (!m_paused) { m_game->window().clear(sf::Color(100, 100, 255)); }
+	if (!m_paused) { m_game->window().clear(sf::Color(100, 100, 255)); } //100 100 255
 	else { m_game->window().clear(sf::Color(50, 50, 150)); }
+
+	//add a background renderer
 
 	// //set the view port of the window to be centered on the player if it's far enough right
 	// std::cout << m_player->hasComponent<CTransform>() <<std::endl;

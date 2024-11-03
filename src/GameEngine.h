@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene.h"
 #include "Assets.h"
+#include "SoundManager.h"
+
 
 #include <memory>
 //cpp
@@ -12,6 +14,7 @@ class GameEngine
 
         sf::RenderWindow       m_window;
         Assets                 m_assets;
+        SoundManager           m_soundmanager;
         std::string            m_currentScene;
         std::map<std::string, std::shared_ptr<Scene>>               m_sceneMap;
         size_t                 m_simulationSpeed = 1;
@@ -28,6 +31,7 @@ class GameEngine
     public:
 
         GameEngine(const std::string & path);
+        ~GameEngine();
 
         void changeScene(const std::string & sceneName, std::shared_ptr<Scene> scene, bool endCurrentScene = false);
 
@@ -37,6 +41,8 @@ class GameEngine
         sf::RenderWindow & window();
         // const Assets & assets() const;
         const Assets & assets() const;
+
+        SoundManager & soundmanager();
         //based off current scene set the music
 
         bool isRunning();

@@ -1,8 +1,10 @@
+// #pragma once
 #include "Assets.h"
 // #include <cassert>
 #include <map>
 #include <filesystem>
 #include <string>
+
 
 Assets::Assets()
 {
@@ -46,11 +48,30 @@ void Assets::loadFromFile(const std::string & path)
             file >> name >> path;
             addFont(name, "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/"+path);
         }
+        // else if (str == "Sound"){
+        //     std::string name, path;
+        //     file >> name >>path;
+        //     addSound(name,"/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/"+path);
+        // }
         else
         {
             std::cerr << "Unknown Asset Type: " << str << std::endl;
         }
     }
+    // SoundManager soundManager;
+    // if (!soundManager.addSound("scream", "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav")) {
+    //     std::cout << "BAD APPLE "; // Handle error if sound fails to load
+    // }
+
+    // auto sound = soundManager.getSound("scream");
+    // sound->play();
+
+
+    // addSound("scream", "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav");
+    // if (!addSound("scream", "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav")) {
+    //     std::cout << "there was huge error"; // Handle error if sound fails to load
+    // }
+
     std::cout <<"NO PROBLEMS OCCURD" <<std::endl <<std::endl;
 }
 
@@ -115,7 +136,6 @@ const Animation& Assets::getAnimation(const std::string& name) const
     if (m_animationMap.find(name) != m_animationMap.end())
     {
         // std::cout << "There is animation with name: " << name << "\n";   
-
     }
     else{
         // std::cerr << "There is no texture with name: " << name << "\n";
@@ -162,3 +182,34 @@ const sf::Font& Assets::getFont(const std::string& fontName) const
     // std::cout <<"makes it here pls";
     return m_fontMap.at(fontName);
 }
+// bool Assets::addSound(const std::string & soundName, const std::string & path)
+// {
+//     // sf::SoundBuffer buffer;
+// 	// // load something into the sound buffer...
+// 	// buffer.loadFromFile(path);
+// 		sf::SoundBuffer buffer;
+//         if (!buffer.loadFromFile(path)) {
+//             std::cout << "NO FILE FOUND FOR SOUND"; 
+//             return false;
+//         }
+//         m_soundMap[soundName] = std::move(buffer); // Store it in the map
+//         return true;
+
+//     std::cout << "made it to addSound ";
+
+// }
+// std::shared_ptr<sf::Sound>  Assets::getSound(const std::string& soundName) {
+//         auto sound = std::make_shared<sf::Sound>();
+//         // sound->setBuffer(m_soundMap[soundName]); // Use the buffer from the map
+//         sound->setBuffer(m_soundMap.at(soundName)); // Use the buffer from the map
+//         return sound; // Return shared_ptr to manage the sound's lifetime
+// }
+// void Assets::loadSounds(const std::string & path)
+// {   
+
+//     //this should read in from a file and add sounds if everything is correct
+//     addSound("scream",path);
+//     addSound("burp","/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/burp.wav");
+//     // "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/burp.wav"
+
+// }

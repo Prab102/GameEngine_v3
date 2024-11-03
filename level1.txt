@@ -93,8 +93,8 @@ Tile Ground    50 0
 Tile Brick     48 6
 Tile Block     52 6
 Tile Block     52 5
-Tile Block     52 4
-Tile Block     52 3
+Tile Brick     52 4
+Tile Brick     52 3
 Tile Block     52 2
 Tile Block     52 1
 Tile Question  52 9

@@ -14,10 +14,10 @@ class Scene
 
     protected:
 
-        GameEngine *    m_game = nullptr;  //base
-        EntityManager   m_entityManager;  //spec
+        GameEngine *    m_game = nullptr;  //
+        EntityManager   m_entityManager;  //
         ActionMap       m_actionMap;   //all actions used for specific scene
-        bool            m_paused = false;  //base
+        bool            m_paused = false;  //
         bool            m_hasEnded = false; // used to find if current scene has ended
         size_t          m_currentFrame = 0;  //currentframe of scene
 

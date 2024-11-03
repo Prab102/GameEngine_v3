@@ -1,21 +1,30 @@
 #include "GameEngine.h"
-
 #include "Assets.h"
 // #include "Scene.h"
 #include "Scene_Play.h"
 #include "Scene_Menu.h"
-#include <SFML/Audio.hpp>
+// #include <SFML/Audio.hpp>
 
 
 GameEngine::GameEngine(const std::string & path)
 {
     init(path);  //path is assets file
 }
+GameEngine::~GameEngine() {
+    // Optional: Print debug info
+    std::cout << "GameEngine is being destroyed." << std::endl;
+}
 
 void GameEngine::init(const std::string & path)
 {
     // std::cout << "makes it here first";
-    m_assets.loadFromFile(path);     
+    //load all sounds here from a file
+    m_soundmanager.loadSounds("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Help.wav"); /////////////////////////////////////////wah
+    // m_soundmanager.loadSounds("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/burp.wav"); /////////////////////////////////////////wah
+
+
+    m_assets.loadFromFile(path);    
+    // m_soundmanager.loadSounds("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav"); /////////////////////////////////////////wah
     // std::cout << "makes it here second";
 
     m_window.create(sf::VideoMode(1280,768), "Definitley Not Mario");
@@ -68,17 +77,17 @@ void GameEngine::run()
 {
     // main gaim loop
     // std::cout << "makes it here lalalala";
-    sf::Music music;
-        if (!music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav")){
-                std::cout << "BAD SOUND";
-        }
-        music.setVolume(20);
-        // music.play();
+    // sf::Music music;
+        // if (!music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav")){
+        //         std::cout << "BAD SOUND";
+        // }
+        // music.setVolume(20);
+        // // music.play();
 
-        if (music.getStatus() == sf::SoundSource::Status::Stopped) {
-            music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/oceanman.wav");
-            music.play();
-	    }
+        // if (music.getStatus() == sf::SoundSource::Status::Stopped) {
+        //     music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/oceanman.wav");
+        //     music.play();
+	    // }
         
 
     while(isRunning())
@@ -97,6 +106,7 @@ void GameEngine::sUserInput()
     {
         if(event.type == sf::Event::Closed)
         {
+
             quit();
         }
         
@@ -179,5 +189,10 @@ void GameEngine::quit()
 const Assets & GameEngine::assets() const
 {
     return m_assets;
+}
+
+ SoundManager & GameEngine::soundmanager()
+{
+    return m_soundmanager;
 }
 

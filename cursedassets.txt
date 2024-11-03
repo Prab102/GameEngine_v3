@@ -18,6 +18,8 @@ Texture     TexBlock    images/mario/block.png
 Texture     TexPole     images/mario/flagpole.png
 Texture     TexPoleTop  images/mario/flagtop.png
 Texture     TexFlag     images/mario/flag.png
+Texture     TexBrick2    images/mario/Brickbreak.png
+Texture     TexPiece    images/mario/Brickpiece.png
 Animation   Stand       TexStand    1   0
 Animation   Run         TexRun      4   10
 Animation   Air         TexAir      1   0
@@ -38,6 +40,8 @@ Animation   Block       TexBlock    1   0
 Animation   Flag        TexFlag     1   0
 Animation   Pole        TexPole     1   0
 Animation   PoleTop     TexPoleTop  1   0
+Animation   Brick2      TexBrick2   1   0
+Animation   Piece       TexPiece    1   0
 Font        Arial       fonts/arial.ttf
 Font        Mario       fonts/mario.ttf
 Font        Megaman     fonts/megaman.ttf

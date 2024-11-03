@@ -1,5 +1,6 @@
 //to run ./sfmlgametest
 //to compile g++ main.cpp -I /opt/homebrew/Cellar/sfml/2.6.1/include -o sfmlgametest -std=c++17 -L /opt/homebrew/Cellar/sfml/2.6.1/lib  -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+// #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string.h>
@@ -19,16 +20,27 @@ int main(){
     // std::cout << v3.x <<" "<<v3.y;
     ///////////////////////////////////////////
     //find a better place to play this when scene is chosen
-    // sf::Music music;
-	// if (!music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/Mega Man 2 - Dr. Wilys Castle.wav")){
-	// 		std::cout << "BAD SOUND";
-	// }
-    // music.setVolume(20);
-	// music.play();
+    sf::Music music;
+	if (!music.openFromFile("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/oceanman.wav")){
+			std::cout << "BAD SOUND";
+	}
+    music.setVolume(20);
+	music.play();
     //////////////////////////////////////////
+    // SoundManager soundManager;
+    // if (!soundManager.addSound("scream", "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav")) {
+    //     std::cout << "BAD APPLE "; // Handle error if sound fails to load
+    // }
+
+    // auto sound = soundManager.getSound("scream");
+    // sound->play();
+    // SoundManager soundManager;
+	// if (!soundManager.addSound("scream", "/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/sounds/scream.wav")) {
+	//     std::cout << "BAD APPLE "; // Handle error if sound fails to load
+	// }
 
 
-    GameEngine g("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/cursedassets.txt");
+    GameEngine g("/Users/prabsingh/Documents/Visual Studio Code/GameDev-SFML/GameEngine_V3/assets.txt");
     g.run();
    
     return 0;
