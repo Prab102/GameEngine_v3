@@ -248,9 +248,7 @@ void Scene_Play::sMovement()
 {
 
 	Vec2 playerVelocity(0,m_player->getComponent<CTransform>().velocity.y);
-	// Vec2 playerVelocity(0,0);
 
-	// size_t jumpstart = 0 ;
 
 	auto& pPos = m_player->getComponent<CTransform>().pos; 
 	m_player->getComponent<CTransform>().prevPos = m_player->getComponent<CTransform>().pos;
